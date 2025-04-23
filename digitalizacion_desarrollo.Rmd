@@ -1,0 +1,99 @@
+
+---
+title: "Impacto de la Digitalización en el Desarrollo Sostenible"
+author: "Valeria Villegas"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(tidyverse)
+library(WDI)
+library(ggplot2)
+library(corrplot)
+library(scales)
+```
+
+# Introducción
+
+La digitalización ha sido una de las fuerzas transformadoras más importantes del siglo XXI. Este estudio busca explorar la relación entre el acceso a internet y variables clave del desarrollo sostenible usando datos del World Development Indicators del Banco Mundial.
+
+# Objetivos
+
+- Analizar la relación entre el acceso a internet y variables de desarrollo humano.
+- Comparar esta relación entre países de ingresos bajos y medios.
+- Identificar patrones y tendencias regionales.
+
+# Carga y Preparación de los Datos
+
+```{r load-data}
+# Indicadores a analizar
+indicators <- c(
+  "IT.NET.USER.ZS",       # Acceso a internet (% población)
+  "SE.SEC.ENRR",          # Matrícula en secundaria
+  "SP.DYN.LE00.IN",       # Esperanza de vida al nacer
+  "NY.GNP.PCAP.CD",       # PNB per cápita (USD)
+  "EG.ELC.ACCS.ZS",       # Acceso a electricidad
+  "SI.POV.DDAY"           # Pobreza extrema (%)
+)
+
+# Descargar datos del Banco Mundial
+data <- WDI(indicator = indicators, start = 2005, end = 2022, extra = TRUE)
+data <- data %>% filter(income %in% c("Low income", "Lower middle income"))
+
+# Visualizar primeras filas
+head(data)
+```
+
+# Análisis Exploratorio
+
+## Correlación entre variables
+
+```{r correlation-plot}
+cor_data <- data %>% 
+  select(IT.NET.USER.ZS, SE.SEC.ENRR, SP.DYN.LE00.IN, NY.GNP.PCAP.CD,
+         EG.ELC.ACCS.ZS, SI.POV.DDAY) %>% 
+  na.omit()
+
+cor_matrix <- cor(cor_data)
+corrplot(cor_matrix, method = "circle", type = "upper", tl.col = "black")
+```
+
+## Evolución temporal del acceso a internet
+
+```{r internet-trend}
+data %>% 
+  filter(country %in% c("Kenya", "India", "Vietnam")) %>% 
+  ggplot(aes(x = year, y = IT.NET.USER.ZS, color = country)) +
+  geom_line(size = 1.2) +
+  labs(title = "Acceso a Internet (% de población)", x = "Año", y = "Porcentaje") +
+  theme_minimal()
+```
+
+## Comparativa de pobreza y acceso a internet
+
+```{r poverty-internet}
+data %>% 
+  filter(country %in% c("Kenya", "India", "Vietnam")) %>% 
+  ggplot(aes(x = IT.NET.USER.ZS, y = SI.POV.DDAY, color = country)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Relación entre Acceso a Internet y Pobreza Extrema",
+       x = "Acceso a Internet (%)", y = "Pobreza extrema (%)") +
+  theme_minimal()
+```
+
+# Conclusiones
+
+- El acceso a internet muestra una fuerte correlación con indicadores sociales positivos como la educación y el ingreso.
+- En los países analizados, el crecimiento del acceso digital coincide con la reducción de la pobreza.
+- Las políticas que promueven el acceso digital en combinación con servicios básicos pueden acelerar el desarrollo sostenible.
+
+
