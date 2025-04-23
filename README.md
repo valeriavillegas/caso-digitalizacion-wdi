@@ -12,4 +12,4 @@ Este repositorio contiene un caso de estudio completo realizado con datos del Wo
 Abrir el `.Rmd` en RStudio y compilarlo como HTML.
 
 ## Autor
-Valeria Villefas – [https://www.linkedin.com/in/valeria-villegas-ribon-businessintelligence/]
+Valeria Villegas – [https://www.linkedin.com/in/valeria-villegas-ribon-businessintelligence/]
